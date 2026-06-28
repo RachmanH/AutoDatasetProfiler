@@ -1,11 +1,12 @@
 import json
 import os
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from db_models import Dataset
-from models import UploadResponse, DatasetMeta
+from models import UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile, DataQuality
 from services.parser import parse_upload
+from services.profiler import profile_dataset, compute_data_quality
 
 router = APIRouter(prefix="/api/datasets", tags=["datasets"])
 
@@ -46,6 +47,23 @@ async def upload_dataset(
     preview = json.loads(df.head(5).to_json(orient="records", date_format="iso"))
 
     return UploadResponse(dataset_id=dataset_id, meta=meta, preview=preview)
+
+
+@router.get("/{dataset_id}/profile", response_model=ProfileResponse)
+def get_profile(dataset_id: str):
+    df = _store.get(dataset_id)
+    if df is None:
+        raise HTTPException(404, "Dataset tidak ditemukan. Upload ulang file.")
+
+    raw_profiles = profile_dataset(df)
+    profiles = [ColumnProfile(**p) for p in raw_profiles]
+    quality = DataQuality(**compute_data_quality(df, raw_profiles))
+
+    return ProfileResponse(
+        dataset_id=dataset_id,
+        profiles=profiles,
+        data_quality=quality,
+    )
 
 
 def get_dataframe(dataset_id: str):
