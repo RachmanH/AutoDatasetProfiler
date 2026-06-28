@@ -4,9 +4,10 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from db_models import Dataset
-from models import UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile, DataQuality
+from models import UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile, DataQuality, TaskSuggestion
 from services.parser import parse_upload
 from services.profiler import profile_dataset, compute_data_quality
+from services.task_suggestion import suggest_task
 
 router = APIRouter(prefix="/api/datasets", tags=["datasets"])
 
@@ -64,6 +65,17 @@ def get_profile(dataset_id: str):
         profiles=profiles,
         data_quality=quality,
     )
+
+
+@router.get("/{dataset_id}/task-suggestion", response_model=TaskSuggestion)
+def get_task_suggestion(dataset_id: str, target_col: str | None = None):
+    df = _store.get(dataset_id)
+    if df is None:
+        raise HTTPException(404, "Dataset tidak ditemukan. Upload ulang file.")
+
+    raw_profiles = profile_dataset(df)
+    result = suggest_task(df, target_col, raw_profiles)
+    return TaskSuggestion(**result)
 
 
 def get_dataframe(dataset_id: str):

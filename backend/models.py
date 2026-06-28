@@ -52,3 +52,10 @@ class ProfileResponse(BaseModel):
     dataset_id: str
     profiles: list[ColumnProfile]
     data_quality: DataQuality
+
+
+class TaskSuggestion(BaseModel):
+    suggested_task: str
+    task_label: str
+    reason: str
+    confidence: str
