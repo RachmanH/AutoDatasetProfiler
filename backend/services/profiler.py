@@ -21,7 +21,7 @@ def detect_column_type(series: pd.Series, col_name: str) -> str:
     if pd.api.types.is_datetime64_any_dtype(series):
         return "datetime"
 
-    converted = pd.to_datetime(series, errors="coerce", infer_datetime_format=True)
+    converted = pd.to_datetime(series, errors="coerce")
     if converted.notna().mean() > 0.8:
         return "datetime"
 
