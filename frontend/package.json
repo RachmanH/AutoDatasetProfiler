@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "axios": "^1.17.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "recharts": "^3.8.1"
@@ -29,5 +31,9 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.29.1",
     "vite": "^7.0.0"
+  },
+  "allowScripts": {
+    "html2canvas@1.4.1": true,
+    "jspdf@4.2.1": true
   }
 }

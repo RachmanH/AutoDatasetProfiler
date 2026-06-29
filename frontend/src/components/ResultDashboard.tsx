@@ -6,6 +6,7 @@ import EDACharts from './dashboard/EDACharts'
 import TaskSuggestion from './dashboard/TaskSuggestion'
 import PreprocessingPreviews from './dashboard/PreprocessingPreviews'
 import ColumnComparison from './dashboard/ColumnComparison'
+import ExportPanel from './dashboard/ExportPanel'
 
 interface Props {
   data: AnalyzeResponse
@@ -13,7 +14,7 @@ interface Props {
   onResearch: () => void
 }
 
-const TABS = ['Ringkasan', 'Profil Kolom', 'Chart EDA', 'Preprocessing', 'Task ML', 'Perbandingan']
+const TABS = ['Ringkasan', 'Profil Kolom', 'Chart EDA', 'Preprocessing', 'Task ML', 'Perbandingan', 'Ekspor']
 
 export default function ResultDashboard({ data, onReset, onResearch }: Props) {
   const [tab, setTab] = useState('Ringkasan')
@@ -62,13 +63,20 @@ export default function ResultDashboard({ data, onReset, onResearch }: Props) {
       </div>
 
       {/* Content */}
-      <div className="mx-auto max-w-6xl px-6 py-8">
+      <div id="dashboard-content" className="mx-auto max-w-6xl px-6 py-8">
         {tab === 'Ringkasan' && <OverviewStats data={data} />}
         {tab === 'Profil Kolom' && <ColumnProfiles profiles={data.profiles} />}
         {tab === 'Chart EDA' && <EDACharts charts={data.charts} />}
         {tab === 'Preprocessing' && <PreprocessingPreviews steps={data.preprocessing} />}
         {tab === 'Task ML' && <TaskSuggestion data={data} />}
         {tab === 'Perbandingan' && <ColumnComparison profiles={data.profiles} charts={data.charts} />}
+        {tab === 'Ekspor' && (
+          <ExportPanel
+            datasetId={data.dataset_id}
+            analysisId={data.analysis_id}
+            filename={data.meta.filename}
+          />
+        )}
       </div>
     </div>
   )
