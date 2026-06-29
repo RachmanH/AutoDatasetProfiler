@@ -15,4 +15,17 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    target: 'es2020',
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          recharts: ['recharts'],
+          pdf: ['html2canvas', 'jspdf'],
+        },
+      },
+    },
+  },
 })
