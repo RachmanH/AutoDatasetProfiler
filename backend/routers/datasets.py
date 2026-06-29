@@ -4,11 +4,12 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from db_models import Dataset
-from models import UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile, DataQuality, TaskSuggestion
+from models import UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile, DataQuality, TaskSuggestion, PreprocessingStep
 from services.parser import parse_upload
 from services.profiler import profile_dataset, compute_data_quality
 from services.task_suggestion import suggest_task
 from services.charts import build_eda_charts
+from services.preprocessing import generate_preprocessing_previews
 
 router = APIRouter(prefix="/api/datasets", tags=["datasets"])
 
@@ -86,6 +87,16 @@ def get_charts(dataset_id: str):
         raise HTTPException(404, "Dataset tidak ditemukan. Upload ulang file.")
     raw_profiles = profile_dataset(df)
     return {"dataset_id": dataset_id, "charts": build_eda_charts(df, raw_profiles)}
+
+
+@router.get("/{dataset_id}/preprocessing", response_model=list[PreprocessingStep])
+def get_preprocessing_preview(dataset_id: str):
+    df = _store.get(dataset_id)
+    if df is None:
+        raise HTTPException(404, "Dataset tidak ditemukan. Upload ulang file.")
+    raw_profiles = profile_dataset(df)
+    steps = generate_preprocessing_previews(df, raw_profiles)
+    return [PreprocessingStep(**s) for s in steps]
 
 
 def get_dataframe(dataset_id: str):

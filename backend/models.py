@@ -59,3 +59,11 @@ class TaskSuggestion(BaseModel):
     task_label: str
     reason: str
     confidence: str
+
+
+class PreprocessingStep(BaseModel):
+    step: str
+    column: str
+    method: str
+    before: list[Any]
+    after: list[Any]
