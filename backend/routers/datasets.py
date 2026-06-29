@@ -105,6 +105,33 @@ def get_preprocessing_preview(dataset_id: str):
     return [PreprocessingStep(**s) for s in steps]
 
 
+@router.get("/history")
+def get_history(db: Session = Depends(get_db)):
+    results = db.query(AnalysisResult).order_by(AnalysisResult.created_at.desc()).limit(50).all()
+    history = []
+    for r in results:
+        ds = db.get(Dataset, r.dataset_id)
+        history.append({
+            "analysis_id": r.id,
+            "dataset_id": r.dataset_id,
+            "filename": ds.filename if ds else "unknown",
+            "target_column": r.target_column,
+            "created_at": r.created_at.isoformat(),
+        })
+    return {"history": history}
+
+
+@router.get("/{dataset_id}/analysis/{analysis_id}")
+def get_analysis(dataset_id: str, analysis_id: int, db: Session = Depends(get_db)):
+    result = db.query(AnalysisResult).filter(
+        AnalysisResult.id == analysis_id,
+        AnalysisResult.dataset_id == dataset_id,
+    ).first()
+    if result is None:
+        raise HTTPException(404, "Hasil analisis tidak ditemukan.")
+    return {"dataset_id": dataset_id, "analysis_id": analysis_id, **json.loads(result.result_json)}
+
+
 @router.post("/analyze", response_model=AnalyzeResponse)
 def analyze_dataset(req: AnalyzeRequest, db: Session = Depends(get_db)):
     df = _store.get(req.dataset_id)
