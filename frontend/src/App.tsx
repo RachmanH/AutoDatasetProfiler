@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { Step, UploadResponse, AnalyzeResponse } from './types'
+import LandingPage from './components/LandingPage'
 
 const SS_STEP = 'adp_step'
 const SS_UPLOAD = 'adp_upload'
@@ -47,27 +48,18 @@ export default function App() {
     setStep('results')
   }
 
-  // Placeholder renders — komponen akan ditambah per commit
+  const placeholder = (label: string) => (
+    <div className="min-h-screen flex items-center justify-center text-slate-400">{label} — segera hadir</div>
+  )
+
   const renders: Record<Step, JSX.Element> = {
-    landing: (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-slate-50">
-        <h1 className="text-4xl font-bold text-slate-800">AutoDataset Profiler</h1>
-        <p className="text-slate-500 text-lg">Analisis dataset otomatis berbasis AI</p>
-        <button
-          onClick={() => setStep('upload')}
-          className="px-8 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
-        >
-          Mulai Analisis
-        </button>
-      </div>
-    ),
-    upload: <div className="p-8 text-center text-slate-400">Upload page — segera hadir</div>,
-    preview: <div className="p-8 text-center text-slate-400">Preview page — segera hadir</div>,
-    results: <div className="p-8 text-center text-slate-400">Results page — segera hadir</div>,
-    research: <div className="p-8 text-center text-slate-400">Research page — segera hadir</div>,
+    landing: <LandingPage onStart={() => setStep('upload')} />,
+    upload: placeholder('Upload page'),
+    preview: placeholder('Preview page'),
+    results: placeholder('Results page'),
+    research: placeholder('Research page'),
   }
 
-  // Expose handlers via data attrs for child components (temporary)
   void handleUploaded
   void handleAnalyzed
   void handleReset
