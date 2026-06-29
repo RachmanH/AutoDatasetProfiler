@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { AnalyzeResponse } from '../types'
 import OverviewStats from './dashboard/OverviewStats'
 import ColumnProfiles from './dashboard/ColumnProfiles'
+import EDACharts from './dashboard/EDACharts'
 
 interface Props {
   data: AnalyzeResponse
@@ -61,9 +62,7 @@ export default function ResultDashboard({ data, onReset, onResearch }: Props) {
       <div className="mx-auto max-w-6xl px-6 py-8">
         {tab === 'Ringkasan' && <OverviewStats data={data} />}
         {tab === 'Profil Kolom' && <ColumnProfiles profiles={data.profiles} />}
-        {tab === 'Chart EDA' && (
-          <div className="text-center text-slate-400 py-20">Chart EDA — segera hadir di commit berikutnya</div>
-        )}
+        {tab === 'Chart EDA' && <EDACharts charts={data.charts} />}
         {tab === 'Preprocessing' && (
           <div className="text-center text-slate-400 py-20">Preview Preprocessing — segera hadir</div>
         )}
