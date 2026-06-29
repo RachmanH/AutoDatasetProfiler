@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
 
 @keyframes progress {
   0%   { transform: translateX(-100%); }
@@ -15,6 +16,14 @@
     --color-text: 15 23 42;
     --color-muted: 100 116 139;
     --radius-card: 1rem;
+  }
+
+  .dark {
+    --color-surface: 30 41 59;
+    --color-bg: 15 23 42;
+    --color-border: 51 65 85;
+    --color-text: 241 245 249;
+    --color-muted: 148 163 184;
   }
 
   html {

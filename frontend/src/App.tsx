@@ -6,6 +6,8 @@ import PreviewPage from './components/PreviewPage'
 import ResultDashboard from './components/ResultDashboard'
 import ResearchPRDPage from './components/ResearchPRDPage'
 import HistoryPage from './components/HistoryPage'
+import DarkModeToggle from './components/ui/DarkModeToggle'
+import { useDarkMode } from './hooks/useDarkMode'
 
 const SS_STEP = 'adp_step'
 const SS_UPLOAD = 'adp_upload'
@@ -29,6 +31,7 @@ function ssSet(key: string, value: unknown) {
 }
 
 export default function App() {
+  const { dark, toggle } = useDarkMode()
   const [step, setStep] = useState<Step>(() => ssGet<Step>(SS_STEP) ?? 'landing')
   const [uploadData, setUploadData] = useState<UploadResponse | null>(() => ssGet(SS_UPLOAD))
   const [analyzeData, setAnalyzeData] = useState<AnalyzeResponse | null>(() => ssGet(SS_ANALYZE))
@@ -73,5 +76,12 @@ export default function App() {
   }
 
 
-  return <>{renders[step]}</>
+  return (
+    <>
+      <div className="fixed top-3 right-3 z-50">
+        <DarkModeToggle dark={dark} toggle={toggle} />
+      </div>
+      {renders[step]}
+    </>
+  )
 }
