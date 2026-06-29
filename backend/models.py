@@ -67,3 +67,20 @@ class PreprocessingStep(BaseModel):
     method: str
     before: list[Any]
     after: list[Any]
+
+
+class AnalyzeRequest(BaseModel):
+    dataset_id: str
+    target_col: str | None = None
+
+
+class AnalyzeResponse(BaseModel):
+    dataset_id: str
+    analysis_id: int
+    meta: DatasetMeta
+    profiles: list[ColumnProfile]
+    data_quality: DataQuality
+    task_suggestion: TaskSuggestion
+    charts: list[dict[str, Any]]
+    preprocessing: list[PreprocessingStep]
+    llm_understanding: dict[str, Any] | None = None

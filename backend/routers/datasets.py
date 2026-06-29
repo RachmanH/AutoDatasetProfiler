@@ -3,13 +3,19 @@ import os
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
-from db_models import Dataset
-from models import UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile, DataQuality, TaskSuggestion, PreprocessingStep
+from db_models import Dataset, AnalysisResult
+from models import (
+    UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile,
+    DataQuality, TaskSuggestion, PreprocessingStep,
+    AnalyzeRequest, AnalyzeResponse,
+)
 from services.parser import parse_upload
 from services.profiler import profile_dataset, compute_data_quality
 from services.task_suggestion import suggest_task
 from services.charts import build_eda_charts
 from services.preprocessing import generate_preprocessing_previews
+from services.fingerprint import build_fingerprint
+from services.llm import call_llm
 
 router = APIRouter(prefix="/api/datasets", tags=["datasets"])
 
@@ -97,6 +103,63 @@ def get_preprocessing_preview(dataset_id: str):
     raw_profiles = profile_dataset(df)
     steps = generate_preprocessing_previews(df, raw_profiles)
     return [PreprocessingStep(**s) for s in steps]
+
+
+@router.post("/analyze", response_model=AnalyzeResponse)
+def analyze_dataset(req: AnalyzeRequest, db: Session = Depends(get_db)):
+    df = _store.get(req.dataset_id)
+    if df is None:
+        raise HTTPException(404, "Dataset tidak ditemukan. Upload ulang file.")
+
+    db_dataset = db.get(Dataset, req.dataset_id)
+    if db_dataset is None:
+        raise HTTPException(404, "Metadata dataset tidak ditemukan di database.")
+
+    meta = DatasetMeta(
+        dataset_id=req.dataset_id,
+        filename=db_dataset.filename,
+        file_type=db_dataset.file_type,
+        row_count=db_dataset.row_count,
+        column_count=db_dataset.column_count,
+        file_size_kb=db_dataset.file_size_kb,
+        columns=df.columns.tolist(),
+    )
+
+    raw_profiles = profile_dataset(df)
+    raw_quality = compute_data_quality(df, raw_profiles)
+    profiles = [ColumnProfile(**p) for p in raw_profiles]
+    quality = DataQuality(**raw_quality)
+    task = TaskSuggestion(**suggest_task(df, req.target_col, raw_profiles))
+    charts = build_eda_charts(df, raw_profiles)
+    preprocessing = [PreprocessingStep(**s) for s in generate_preprocessing_previews(df, raw_profiles)]
+
+    fingerprint = build_fingerprint(df, raw_profiles, raw_quality, meta.model_dump(), req.target_col)
+    llm_result = call_llm(fingerprint)
+
+    result_payload = {
+        "meta": meta.model_dump(),
+        "profiles": [p.model_dump() for p in profiles],
+        "data_quality": quality.model_dump(),
+        "task_suggestion": task.model_dump(),
+        "charts": charts,
+        "preprocessing": [s.model_dump() for s in preprocessing],
+        "llm_understanding": llm_result,
+    }
+
+    db_result = AnalysisResult(
+        dataset_id=req.dataset_id,
+        target_column=req.target_col,
+        result_json=json.dumps(result_payload, ensure_ascii=False),
+    )
+    db.add(db_result)
+    db.commit()
+    db.refresh(db_result)
+
+    return AnalyzeResponse(
+        dataset_id=req.dataset_id,
+        analysis_id=db_result.id,
+        **result_payload,
+    )
 
 
 def get_dataframe(dataset_id: str):
