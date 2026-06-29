@@ -92,7 +92,7 @@ export default function PreviewPage({ uploadData, onAnalyzed, onBack }: Props) {
           <select
             value={targetCol}
             onChange={(e) => setTargetCol(e.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">— Tidak ada (clustering) —</option>
             {meta.columns.map((col) => (
@@ -110,7 +110,7 @@ export default function PreviewPage({ uploadData, onAnalyzed, onBack }: Props) {
         <button
           onClick={handleAnalyze}
           disabled={loading}
-          className="w-full rounded-xl bg-blue-600 py-3.5 text-base font-semibold text-white hover:bg-blue-500 disabled:opacity-60 transition-colors"
+          className="w-full rounded-xl bg-indigo-600 py-3.5 text-base font-semibold text-white hover:bg-indigo-500 disabled:opacity-60 transition-colors"
         >
           {loading ? 'Menganalisis dataset...' : 'Mulai Analisis →'}
         </button>

@@ -41,7 +41,7 @@ export default function LandingPage({ onStart, onHistory }: Props) {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white">
       {/* Hero */}
       <div className="flex flex-col items-center justify-center px-6 pt-24 pb-16 text-center">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-sm text-blue-300">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-sm text-blue-300">
           <span className="h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
           Didukung LLM · Analisis Instan
         </div>
@@ -59,7 +59,7 @@ export default function LandingPage({ onStart, onHistory }: Props) {
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <button
             onClick={onStart}
-            className="rounded-xl bg-blue-600 px-8 py-3.5 text-base font-semibold hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/40"
+            className="rounded-xl bg-indigo-600 px-8 py-3.5 text-base font-semibold hover:bg-indigo-500 transition-colors shadow-lg shadow-blue-900/40"
           >
             Mulai Analisis →
           </button>
@@ -85,7 +85,7 @@ export default function LandingPage({ onStart, onHistory }: Props) {
           {features.map((f) => (
             <div
               key={f.title}
-              className="rounded-2xl border border-slate-700/50 bg-slate-800/50 p-6 hover:border-blue-500/40 transition-colors"
+              className="rounded-2xl border border-slate-700/50 bg-slate-800/50 p-6 hover:border-indigo-500/40 transition-colors"
             >
               <div className="mb-3 text-3xl">{f.icon}</div>
               <h3 className="mb-1 font-semibold text-white">{f.title}</h3>

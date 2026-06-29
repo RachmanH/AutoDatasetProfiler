@@ -35,12 +35,12 @@ export default function ColumnProfiles({ profiles }: Props) {
           placeholder="Cari kolom..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="rounded-xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="rounded-xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="rounded-xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="rounded-xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           {types.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>

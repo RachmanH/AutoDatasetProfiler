@@ -105,8 +105,8 @@ export default function ResearchPRDPage({ analyzeData, onBack }: Props) {
               <h3 className="mb-3 font-semibold text-slate-700">Judul Penelitian</h3>
               <div className="space-y-2 mb-3">
                 {suggestions.suggested_titles.map((t) => (
-                  <label key={t} className={`flex items-start gap-3 cursor-pointer rounded-xl border p-3 transition-colors ${selectedTitle === t ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="title" value={t} checked={selectedTitle === t} onChange={() => setSelectedTitle(t)} className="mt-0.5 accent-blue-600" />
+                  <label key={t} className={`flex items-start gap-3 cursor-pointer rounded-xl border p-3 transition-colors ${selectedTitle === t ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="title" value={t} checked={selectedTitle === t} onChange={() => setSelectedTitle(t)} className="mt-0.5 accent-indigo-600" />
                     <span className="text-sm text-slate-700">{t}</span>
                   </label>
                 ))}
@@ -116,7 +116,7 @@ export default function ResearchPRDPage({ analyzeData, onBack }: Props) {
                 placeholder="Atau ketik judul sendiri..."
                 value={selectedTitle}
                 onChange={(e) => setSelectedTitle(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
@@ -144,7 +144,7 @@ export default function ResearchPRDPage({ analyzeData, onBack }: Props) {
                 onChange={(e) => setBackground(e.target.value)}
                 placeholder="Tuliskan latar belakang penelitian Anda..."
                 rows={4}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
               />
             </div>
 

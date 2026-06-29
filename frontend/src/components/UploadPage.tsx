@@ -65,13 +65,13 @@ export default function UploadPage({ onUploaded, onBack }: Props) {
           onClick={() => inputRef.current?.click()}
           className={`
             cursor-pointer rounded-2xl border-2 border-dashed p-12 text-center transition-colors
-            ${dragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-100'}
+            ${dragging ? 'border-indigo-500 bg-indigo-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-100'}
             ${loading ? 'pointer-events-none opacity-60' : ''}
           `}
         >
           <div className="text-4xl mb-4">📂</div>
           {loading ? (
-            <p className="text-blue-600 font-medium animate-pulse">Mengupload file...</p>
+            <p className="text-indigo-600 font-medium animate-pulse">Mengupload file...</p>
           ) : (
             <>
               <p className="text-slate-600 font-medium">Drag & drop file di sini</p>

@@ -43,7 +43,7 @@ export default function PreprocessingPreviews({ steps }: Props) {
             onClick={() => setFilter(t)}
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               filter === t
-                ? 'bg-blue-600 text-white'
+                ? 'bg-indigo-600 text-white'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
