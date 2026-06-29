@@ -5,6 +5,7 @@ import UploadPage from './components/UploadPage'
 import PreviewPage from './components/PreviewPage'
 import ResultDashboard from './components/ResultDashboard'
 import ResearchPRDPage from './components/ResearchPRDPage'
+import HistoryPage from './components/HistoryPage'
 
 const SS_STEP = 'adp_step'
 const SS_UPLOAD = 'adp_upload'
@@ -57,7 +58,7 @@ export default function App() {
   )
 
   const renders: Record<Step, JSX.Element> = {
-    landing: <LandingPage onStart={() => setStep('upload')} />,
+    landing: <LandingPage onStart={() => setStep('upload')} onHistory={() => setStep('history')} />,
     upload: <UploadPage onUploaded={handleUploaded} onBack={() => setStep('landing')} />,
     preview: uploadData
       ? <PreviewPage uploadData={uploadData} onAnalyzed={handleAnalyzed} onBack={() => setStep('upload')} />
@@ -68,6 +69,7 @@ export default function App() {
     research: analyzeData
       ? <ResearchPRDPage analyzeData={analyzeData} onBack={() => setStep('results')} />
       : placeholder('Research page'),
+    history: <HistoryPage onBack={() => setStep('landing')} />,
   }
 
 

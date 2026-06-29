@@ -1,4 +1,4 @@
-export type Step = 'landing' | 'upload' | 'preview' | 'results' | 'research'
+export type Step = 'landing' | 'upload' | 'preview' | 'results' | 'research' | 'history'
 
 export interface DatasetMeta {
   dataset_id: string

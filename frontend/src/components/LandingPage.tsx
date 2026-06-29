@@ -1,5 +1,6 @@
 interface Props {
   onStart: () => void
+  onHistory: () => void
 }
 
 const features = [
@@ -35,7 +36,7 @@ const features = [
   },
 ]
 
-export default function LandingPage({ onStart }: Props) {
+export default function LandingPage({ onStart, onHistory }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white">
       {/* Hero */}
@@ -62,14 +63,12 @@ export default function LandingPage({ onStart }: Props) {
           >
             Mulai Analisis →
           </button>
-          <a
-            href="https://github.com/RachmanH/AutoDatasetProfiler"
-            target="_blank"
-            rel="noreferrer"
+          <button
+            onClick={onHistory}
             className="rounded-xl border border-slate-600 px-8 py-3.5 text-base font-semibold hover:bg-slate-800 transition-colors"
           >
-            GitHub
-          </a>
+            Riwayat
+          </button>
         </div>
 
         <p className="mt-4 text-sm text-slate-500">
