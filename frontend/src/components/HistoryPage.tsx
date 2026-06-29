@@ -47,7 +47,7 @@ export default function HistoryPage({ onBack }: Props) {
         {!loading && history.length > 0 && (
           <div className="space-y-3">
             {history.map((item) => (
-              <div key={item.analysis_id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:border-blue-300 transition-colors">
+              <div key={item.analysis_id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:border-indigo-300 transition-colors">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="font-semibold text-slate-800">{item.filename}</p>

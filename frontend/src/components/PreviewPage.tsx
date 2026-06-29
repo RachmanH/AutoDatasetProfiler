@@ -39,7 +39,7 @@ export default function PreviewPage({ uploadData, onAnalyzed, onBack }: Props) {
         {/* File info */}
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <h2 className="text-2xl font-bold text-slate-800">{meta.filename}</h2>
-          <span className="rounded-full bg-blue-100 px-3 py-0.5 text-xs font-medium text-blue-700 uppercase">
+          <span className="rounded-full bg-indigo-100 px-3 py-0.5 text-xs font-medium text-indigo-700 uppercase">
             {meta.file_type}
           </span>
         </div>

@@ -37,7 +37,7 @@ export default function ResearchPRDPage({ analyzeData, onBack }: Props) {
     try {
       const res = await getResearchSuggestions(
         analyzeData.dataset_id,
-        analyzeData.task_suggestion.suggested_task === 'clustering_candidate' ? null : null,
+        analyzeData.target_col,
         analyzeData.meta,
       )
       setSuggestions(res.suggestions)

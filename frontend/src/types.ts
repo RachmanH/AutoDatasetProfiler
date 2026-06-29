@@ -72,6 +72,7 @@ export interface ChartData {
 export interface AnalyzeResponse {
   dataset_id: string
   analysis_id: number
+  target_col: string | null
   meta: DatasetMeta
   profiles: ColumnProfile[]
   data_quality: DataQuality

@@ -77,6 +77,7 @@ class AnalyzeRequest(BaseModel):
 class AnalyzeResponse(BaseModel):
     dataset_id: str
     analysis_id: int
+    target_col: str | None = None
     meta: DatasetMeta
     profiles: list[ColumnProfile]
     data_quality: DataQuality

@@ -4,7 +4,7 @@ import { jsPDF } from 'jspdf'
 
 interface Props {
   datasetId: string
-  analysisId: string
+  analysisId: number
   filename: string
 }
 

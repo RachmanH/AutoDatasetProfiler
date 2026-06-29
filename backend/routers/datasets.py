@@ -188,6 +188,7 @@ def analyze_dataset(req: AnalyzeRequest, db: Session = Depends(get_db)):
     return AnalyzeResponse(
         dataset_id=req.dataset_id,
         analysis_id=db_result.id,
+        target_col=req.target_col,
         **result_payload,
     )
 
