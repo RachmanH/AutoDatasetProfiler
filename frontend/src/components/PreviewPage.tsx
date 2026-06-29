@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { analyzeDataset } from '../api'
 import type { UploadResponse, AnalyzeResponse } from '../types'
+import { ProgressBar } from './ui/Skeleton'
 
 interface Props {
   uploadData: UploadResponse
@@ -116,9 +117,9 @@ export default function PreviewPage({ uploadData, onAnalyzed, onBack }: Props) {
         </button>
 
         {loading && (
-          <p className="mt-3 text-center text-sm text-slate-400 animate-pulse">
-            Proses dapat memakan waktu hingga 3 menit untuk dataset besar.
-          </p>
+          <div className="mt-4">
+            <ProgressBar label="Menganalisis dataset — bisa memakan waktu 1–3 menit..." />
+          </div>
         )}
       </div>
     </div>

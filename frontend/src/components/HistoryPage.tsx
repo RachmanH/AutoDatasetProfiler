@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getHistory } from '../api'
 import type { HistoryItem } from '../types'
+import { SkeletonCard } from './ui/Skeleton'
 
 interface Props {
   onBack: () => void
@@ -27,7 +28,9 @@ export default function HistoryPage({ onBack }: Props) {
         </div>
 
         {loading && (
-          <div className="text-center text-slate-400 animate-pulse py-20">Memuat riwayat...</div>
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+          </div>
         )}
 
         {error && (

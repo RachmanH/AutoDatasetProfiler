@@ -1,6 +1,7 @@
 import { useState, useRef, DragEvent } from 'react'
 import { uploadDataset } from '../api'
 import type { UploadResponse } from '../types'
+import { ProgressBar } from './ui/Skeleton'
 
 interface Props {
   onUploaded: (data: UploadResponse) => void
@@ -87,6 +88,12 @@ export default function UploadPage({ onUploaded, onBack }: Props) {
           className="hidden"
           onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
         />
+
+        {loading && (
+          <div className="mt-4">
+            <ProgressBar label="Mengupload file..." />
+          </div>
+        )}
 
         {error && (
           <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
