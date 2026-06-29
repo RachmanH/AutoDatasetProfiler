@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { Step, UploadResponse, AnalyzeResponse } from './types'
 import LandingPage from './components/LandingPage'
 import UploadPage from './components/UploadPage'
+import PreviewPage from './components/PreviewPage'
 
 const SS_STEP = 'adp_step'
 const SS_UPLOAD = 'adp_upload'
@@ -56,12 +57,13 @@ export default function App() {
   const renders: Record<Step, JSX.Element> = {
     landing: <LandingPage onStart={() => setStep('upload')} />,
     upload: <UploadPage onUploaded={handleUploaded} onBack={() => setStep('landing')} />,
-    preview: placeholder('Preview page'),
+    preview: uploadData
+      ? <PreviewPage uploadData={uploadData} onAnalyzed={handleAnalyzed} onBack={() => setStep('upload')} />
+      : placeholder('Preview page'),
     results: placeholder('Results page'),
     research: placeholder('Research page'),
   }
 
-  void handleAnalyzed
   void handleReset
 
   return <>{renders[step]}</>
