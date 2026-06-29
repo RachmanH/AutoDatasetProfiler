@@ -8,6 +8,7 @@ from models import UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile, 
 from services.parser import parse_upload
 from services.profiler import profile_dataset, compute_data_quality
 from services.task_suggestion import suggest_task
+from services.charts import build_eda_charts
 
 router = APIRouter(prefix="/api/datasets", tags=["datasets"])
 
@@ -76,6 +77,15 @@ def get_task_suggestion(dataset_id: str, target_col: str | None = None):
     raw_profiles = profile_dataset(df)
     result = suggest_task(df, target_col, raw_profiles)
     return TaskSuggestion(**result)
+
+
+@router.get("/{dataset_id}/charts")
+def get_charts(dataset_id: str):
+    df = _store.get(dataset_id)
+    if df is None:
+        raise HTTPException(404, "Dataset tidak ditemukan. Upload ulang file.")
+    raw_profiles = profile_dataset(df)
+    return {"dataset_id": dataset_id, "charts": build_eda_charts(df, raw_profiles)}
 
 
 def get_dataframe(dataset_id: str):
