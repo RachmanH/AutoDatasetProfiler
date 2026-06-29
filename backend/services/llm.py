@@ -48,7 +48,10 @@ def call_llm(fingerprint: dict) -> dict | None:
             timeout=60,
         )
         resp.raise_for_status()
-        raw = resp.json()["choices"][0]["message"]["content"]
+        msg = resp.json()["choices"][0]["message"]
+        raw = msg.get("content") or msg.get("reasoning_content") or ""
+        if not raw:
+            return None
         return _parse_llm_response(raw, fingerprint)
     except Exception:
         return None

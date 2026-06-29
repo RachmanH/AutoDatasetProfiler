@@ -58,7 +58,7 @@ def generate_prd(req: PRDRequest):
         req.background,
         req.research_questions,
     )
-    if prd_markdown is None:
+    if not prd_markdown:
         raise HTTPException(503, "LLM tidak tersedia atau API key tidak dikonfigurasi.")
 
     return {"dataset_id": req.dataset_id, "prd_markdown": prd_markdown}

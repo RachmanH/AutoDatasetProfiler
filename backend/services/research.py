@@ -1,4 +1,5 @@
 import json
+import re
 import requests
 from config import OPENCODE_API_KEY, OPENCODE_MODEL, OPENCODE_URL
 
@@ -39,15 +40,16 @@ def generate_research_prd(
     if not OPENCODE_API_KEY:
         return None
 
-    prompt = f"""Buat dokumen PRD (Product Requirements Document) penelitian dalam format Markdown.
+    prompt = f"""Tulis dokumen PRD penelitian dalam Markdown, bahasa Indonesia akademis. Output HANYA markdown, tanpa teks pengantar.
 
-Dataset: {json.dumps(fingerprint.get('metadata', {}), ensure_ascii=False)}
-Judul: {selected_title}
-Task ML: {selected_task}
-Latar belakang: {background}
-Pertanyaan penelitian: {json.dumps(research_questions, ensure_ascii=False)}
+Informasi:
+- Judul: {selected_title}
+- Task ML: {selected_task}
+- Latar belakang: {background}
+- Pertanyaan penelitian: {'; '.join(research_questions)}
+- Dataset: {fingerprint.get('metadata', {}).get('rows', '?')} baris, {fingerprint.get('metadata', {}).get('columns', '?')} kolom
 
-Buat PRD dengan bagian:
+Struktur dokumen:
 # {selected_title}
 
 ## 1. Latar Belakang
@@ -60,11 +62,9 @@ Buat PRD dengan bagian:
 ### 4.4 Evaluasi
 ## 5. Ekspektasi Hasil
 ## 6. Timeline
-## 7. Referensi (placeholder)
+## 7. Referensi"""
 
-Gunakan bahasa Indonesia yang akademis."""
-
-    result = _call_raw(prompt)
+    result = _call_raw(prompt, temperature=0.0, max_tokens=8000)
     return result
 
 
@@ -85,7 +85,7 @@ def _call(prompt: str) -> dict | None:
     return None
 
 
-def _call_raw(prompt: str) -> str | None:
+def _call_raw(prompt: str, temperature: float = 0.4, max_tokens: int = 3000) -> str | None:
     try:
         resp = requests.post(
             OPENCODE_URL,
@@ -93,12 +93,14 @@ def _call_raw(prompt: str) -> str | None:
             json={
                 "model": OPENCODE_MODEL,
                 "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.4,
-                "max_tokens": 3000,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
             },
             timeout=90,
         )
         resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
+        msg = resp.json()["choices"][0]["message"]
+        content = (msg.get("content") or "").strip()
+        return content or None
     except Exception:
         return None
