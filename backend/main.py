@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
-from routers import datasets, llm
+from routers import datasets, llm, research
 
 app = FastAPI(title="AutoDataset Profiler API")
 
@@ -16,6 +16,7 @@ app.add_middleware(
 
 app.include_router(datasets.router)
 app.include_router(llm.router)
+app.include_router(research.router)
 
 
 @app.on_event("startup")
