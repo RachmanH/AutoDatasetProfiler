@@ -1,6 +1,9 @@
+import csv
+import io
 import json
 import os
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from database import get_db
 from db_models import Dataset, AnalysisResult
@@ -186,6 +189,52 @@ def analyze_dataset(req: AnalyzeRequest, db: Session = Depends(get_db)):
         dataset_id=req.dataset_id,
         analysis_id=db_result.id,
         **result_payload,
+    )
+
+
+@router.get("/{dataset_id}/export/json")
+def export_json(dataset_id: str, analysis_id: int, db: Session = Depends(get_db)):
+    result = db.query(AnalysisResult).filter(
+        AnalysisResult.id == analysis_id,
+        AnalysisResult.dataset_id == dataset_id,
+    ).first()
+    if result is None:
+        raise HTTPException(404, "Hasil analisis tidak ditemukan.")
+
+    content = result.result_json.encode("utf-8")
+    return StreamingResponse(
+        io.BytesIO(content),
+        media_type="application/json",
+        headers={"Content-Disposition": f"attachment; filename=analysis_{analysis_id}.json"},
+    )
+
+
+@router.get("/{dataset_id}/export/csv")
+def export_csv(dataset_id: str, analysis_id: int, db: Session = Depends(get_db)):
+    result = db.query(AnalysisResult).filter(
+        AnalysisResult.id == analysis_id,
+        AnalysisResult.dataset_id == dataset_id,
+    ).first()
+    if result is None:
+        raise HTTPException(404, "Hasil analisis tidak ditemukan.")
+
+    data = json.loads(result.result_json)
+    profiles = data.get("profiles", [])
+
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=[
+        "column", "dtype", "detected_type", "unique_count",
+        "missing_count", "missing_percentage",
+    ])
+    writer.writeheader()
+    for p in profiles:
+        writer.writerow({k: p.get(k, "") for k in writer.fieldnames})
+
+    output.seek(0)
+    return StreamingResponse(
+        io.BytesIO(output.getvalue().encode("utf-8")),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=profiles_{analysis_id}.csv"},
     )
 
 
