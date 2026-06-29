@@ -3,6 +3,8 @@ import type { AnalyzeResponse } from '../types'
 import OverviewStats from './dashboard/OverviewStats'
 import ColumnProfiles from './dashboard/ColumnProfiles'
 import EDACharts from './dashboard/EDACharts'
+import TaskSuggestion from './dashboard/TaskSuggestion'
+import PreprocessingPreviews from './dashboard/PreprocessingPreviews'
 
 interface Props {
   data: AnalyzeResponse
@@ -63,12 +65,8 @@ export default function ResultDashboard({ data, onReset, onResearch }: Props) {
         {tab === 'Ringkasan' && <OverviewStats data={data} />}
         {tab === 'Profil Kolom' && <ColumnProfiles profiles={data.profiles} />}
         {tab === 'Chart EDA' && <EDACharts charts={data.charts} />}
-        {tab === 'Preprocessing' && (
-          <div className="text-center text-slate-400 py-20">Preview Preprocessing — segera hadir</div>
-        )}
-        {tab === 'Task ML' && (
-          <div className="text-center text-slate-400 py-20">Saran Task ML — segera hadir</div>
-        )}
+        {tab === 'Preprocessing' && <PreprocessingPreviews steps={data.preprocessing} />}
+        {tab === 'Task ML' && <TaskSuggestion data={data} />}
       </div>
     </div>
   )
