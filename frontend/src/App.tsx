@@ -3,6 +3,7 @@ import type { Step, UploadResponse, AnalyzeResponse } from './types'
 import LandingPage from './components/LandingPage'
 import UploadPage from './components/UploadPage'
 import PreviewPage from './components/PreviewPage'
+import ResultDashboard from './components/ResultDashboard'
 
 const SS_STEP = 'adp_step'
 const SS_UPLOAD = 'adp_upload'
@@ -60,11 +61,12 @@ export default function App() {
     preview: uploadData
       ? <PreviewPage uploadData={uploadData} onAnalyzed={handleAnalyzed} onBack={() => setStep('upload')} />
       : placeholder('Preview page'),
-    results: placeholder('Results page'),
+    results: analyzeData
+      ? <ResultDashboard data={analyzeData} onReset={handleReset} onResearch={() => setStep('research')} />
+      : placeholder('Results page'),
     research: placeholder('Research page'),
   }
 
-  void handleReset
 
   return <>{renders[step]}</>
 }
