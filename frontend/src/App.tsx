@@ -4,6 +4,7 @@ import LandingPage from './components/LandingPage'
 import UploadPage from './components/UploadPage'
 import PreviewPage from './components/PreviewPage'
 import ResultDashboard from './components/ResultDashboard'
+import ResearchPRDPage from './components/ResearchPRDPage'
 
 const SS_STEP = 'adp_step'
 const SS_UPLOAD = 'adp_upload'
@@ -64,7 +65,9 @@ export default function App() {
     results: analyzeData
       ? <ResultDashboard data={analyzeData} onReset={handleReset} onResearch={() => setStep('research')} />
       : placeholder('Results page'),
-    research: placeholder('Research page'),
+    research: analyzeData
+      ? <ResearchPRDPage analyzeData={analyzeData} onBack={() => setStep('results')} />
+      : placeholder('Research page'),
   }
 
 
