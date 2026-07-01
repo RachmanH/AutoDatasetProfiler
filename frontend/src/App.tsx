@@ -85,7 +85,7 @@ export default function App() {
 
   return (
     <>
-      <div className="fixed top-3 right-3 z-50">
+      <div className="fixed bottom-3 right-3 z-50">
         <DarkModeToggle dark={dark} toggle={toggle} />
       </div>
       {renders[step]}

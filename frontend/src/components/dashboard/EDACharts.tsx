@@ -13,7 +13,7 @@ const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'
 
 export default function EDACharts({ charts }: Props) {
   if (!charts.length) {
-    return <p className="text-slate-400 text-center py-20">Tidak ada chart tersedia.</p>
+    return <p className="text-slate-400 dark:text-slate-500 text-center py-20">Tidak ada chart tersedia.</p>
   }
 
   return (
@@ -29,8 +29,8 @@ function ChartCard({ chart, colorIdx }: { chart: ChartData; colorIdx: number }) 
   const color = COLORS[colorIdx % COLORS.length]
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h4 className="mb-4 text-sm text-slate-700">{chart.title}</h4>
+    <div className="card p-5">
+      <h4 className="mb-4 text-sm text-slate-700 dark:text-slate-300">{chart.title}</h4>
       {chart.type === 'histogram' && <HistogramChart data={chart.data as {name:string,jumlah:number}[]} color={color} />}
       {chart.type === 'bar' && <BarChartComp data={chart.data as {name:string,jumlah:number}[]} color={color} />}
       {chart.type === 'pie' && <PieChartComp data={chart.data as {name:string,value:number}[]} />}
@@ -141,13 +141,13 @@ function HeatmapComp({ data, columns }: { data: HeatRow[]; columns: string[] }) 
         <thead>
           <tr>
             <th className="p-1" />
-            {columns.map((c) => <th key={c} className="p-1 text-slate-500 max-w-[60px] truncate">{c}</th>)}
+            {columns.map((c) => <th key={c} className="p-1 text-slate-500 dark:text-slate-400 max-w-[60px] truncate">{c}</th>)}
           </tr>
         </thead>
         <tbody>
           {columns.map((row) => (
             <tr key={row}>
-              <td className="p-1 font-medium text-slate-500 max-w-[60px] truncate pr-2">{row}</td>
+              <td className="p-1 font-medium text-slate-500 dark:text-slate-400 max-w-[60px] truncate pr-2">{row}</td>
               {columns.map((col) => {
                 const cell = data.find((d) => d.x === col && d.y === row)
                 const val = cell?.value ?? 0

@@ -30,16 +30,16 @@ export default function PreviewPage({ uploadData, onAnalyzed, onBack }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 px-4 py-10">
       <div className="mx-auto max-w-5xl">
-        <button onClick={onBack} className="mb-6 text-sm text-slate-500 hover:text-slate-800 transition">
+        <button onClick={onBack} className="mb-6 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition">
           ← Upload ulang
         </button>
 
         {/* File info */}
         <div className="mb-6 flex flex-wrap items-center gap-3">
-          <h2 className="text-2xl font-bold text-slate-800">{meta.filename}</h2>
-          <span className="rounded-full bg-indigo-100 px-3 py-0.5 text-xs font-medium text-indigo-700 uppercase">
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{meta.filename}</h2>
+          <span className="rounded-full bg-indigo-100 dark:bg-indigo-950/40 px-3 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-300 uppercase">
             {meta.file_type}
           </span>
         </div>
@@ -50,31 +50,31 @@ export default function PreviewPage({ uploadData, onAnalyzed, onBack }: Props) {
             { label: 'Kolom', value: meta.column_count },
             { label: 'Ukuran', value: `${meta.file_size_kb.toFixed(1)} KB` },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-center shadow-sm">
-              <div className="text-xl font-bold text-slate-800">{s.value}</div>
-              <div className="text-xs text-slate-500">{s.label}</div>
+            <div key={s.label} className="card px-5 py-3 text-center">
+              <div className="text-xl font-bold text-slate-800 dark:text-slate-100">{s.value}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">{s.label}</div>
             </div>
           ))}
         </div>
 
         {/* Preview table */}
-        <div className="mb-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <p className="border-b border-slate-100 px-5 py-3 text-sm font-medium text-slate-600">
+        <div className="card mb-8 overflow-x-auto">
+          <p className="border-b border-slate-100 dark:border-slate-700 px-5 py-3 text-sm font-medium text-slate-600 dark:text-slate-300">
             Preview 5 baris pertama
           </p>
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
+            <thead className="bg-slate-50 dark:bg-slate-900/60 text-left text-xs text-slate-500 dark:text-slate-400 uppercase">
               <tr>
                 {meta.columns.map((col) => (
                   <th key={col} className="px-4 py-3 font-medium whitespace-nowrap">{col}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {preview.map((row, i) => (
-                <tr key={i} className="hover:bg-slate-50">
+                <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800">
                   {meta.columns.map((col) => (
-                    <td key={col} className="px-4 py-2.5 text-slate-700 whitespace-nowrap max-w-[200px] truncate">
+                    <td key={col} className="px-4 py-2.5 text-slate-700 dark:text-slate-300 whitespace-nowrap max-w-[200px] truncate">
                       {String(row[col] ?? '')}
                     </td>
                   ))}
@@ -85,15 +85,15 @@ export default function PreviewPage({ uploadData, onAnalyzed, onBack }: Props) {
         </div>
 
         {/* Target column */}
-        <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="mb-1 font-semibold text-slate-800">Pilih Kolom Target (opsional)</h3>
-          <p className="mb-4 text-sm text-slate-500">
+        <div className="card mb-8 p-6">
+          <h3 className="mb-1 font-semibold text-slate-800 dark:text-slate-100">Pilih Kolom Target (opsional)</h3>
+          <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
             Kolom yang ingin diprediksi / dianalisis. Kosongkan agar AI yang memilihkan.
           </p>
           <select
             value={targetCol}
             onChange={(e) => setTargetCol(e.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">— Biarkan AI memilih —</option>
             {meta.columns.map((col) => (
@@ -103,7 +103,7 @@ export default function PreviewPage({ uploadData, onAnalyzed, onBack }: Props) {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+          <div className="mb-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 px-4 py-3 text-sm text-red-600 dark:text-red-400">
             {error}
           </div>
         )}
