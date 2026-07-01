@@ -69,6 +69,13 @@ export interface ChartData {
   [key: string]: unknown
 }
 
+export interface TargetRecommendation {
+  column: string
+  reason: string
+  confidence: string
+  task_suggestion: TaskSuggestion
+}
+
 export interface AnalyzeResponse {
   dataset_id: string
   analysis_id: number
@@ -80,6 +87,7 @@ export interface AnalyzeResponse {
   charts: ChartData[]
   preprocessing: PreprocessingStep[]
   llm_understanding: Record<string, unknown> | null
+  target_recommendations: TargetRecommendation[] | null
 }
 
 export interface HistoryItem {

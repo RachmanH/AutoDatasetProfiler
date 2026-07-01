@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import type { AnalyzeResponse } from '../../types'
 
 interface Props {
   data: AnalyzeResponse
+  onRetarget: (targetCol: string) => Promise<void>
 }
 
 const CONFIDENCE_COLOR: Record<string, string> = {
@@ -19,15 +21,27 @@ const TASK_ICON: Record<string, string> = {
   unknown: '❓',
 }
 
-export default function TaskSuggestion({ data }: Props) {
-  const { task_suggestion, llm_understanding } = data
+export default function TaskSuggestion({ data, onRetarget }: Props) {
+  const { task_suggestion, llm_understanding, target_recommendations, target_col } = data
   const llm = llm_understanding as Record<string, unknown> | null
+  const [switching, setSwitching] = useState<string | null>(null)
+
+  async function handleUse(column: string) {
+    setSwitching(column)
+    try {
+      await onRetarget(column)
+    } finally {
+      setSwitching(null)
+    }
+  }
 
   return (
     <div className="space-y-6">
       {/* Rule-based suggestion */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="mb-4 text-sm font-semibold text-slate-600 uppercase tracking-wide">Saran Task (Berbasis Aturan)</h3>
+        <h3 className="mb-4 text-sm font-semibold text-slate-600 uppercase tracking-wide">
+          Target Terpakai: {target_col ? <code className="normal-case">{target_col}</code> : 'Tidak ada'}
+        </h3>
         <div className="flex items-center gap-4">
           <span className="text-5xl">{TASK_ICON[task_suggestion.suggested_task] ?? '❓'}</span>
           <div>
@@ -41,6 +55,39 @@ export default function TaskSuggestion({ data }: Props) {
           </div>
         </div>
       </div>
+
+      {/* AI target recommendations */}
+      {target_recommendations && target_recommendations.length > 0 && (
+        <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-6">
+          <h3 className="mb-4 text-sm font-semibold text-indigo-700 uppercase tracking-wide">Rekomendasi Kolom Target (AI)</h3>
+          <div className="space-y-3">
+            {target_recommendations.map((rec, i) => (
+              <div key={rec.column} className="flex items-center justify-between gap-4 rounded-xl bg-white p-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-indigo-500">
+                      {i === 0 ? 'Terbaik' : i === 1 ? 'Alternatif 2' : 'Alternatif 3'}
+                    </span>
+                    <code className="text-xs font-mono bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">{rec.column}</code>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${CONFIDENCE_COLOR[rec.confidence] ?? ''}`}>
+                      {rec.confidence}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-slate-600">{rec.reason}</p>
+                  <p className="mt-0.5 text-xs text-slate-400">Task: {rec.task_suggestion.task_label}</p>
+                </div>
+                <button
+                  onClick={() => handleUse(rec.column)}
+                  disabled={switching !== null || rec.column === target_col}
+                  className="shrink-0 rounded-lg border border-indigo-300 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 disabled:opacity-50 transition"
+                >
+                  {rec.column === target_col ? 'Sedang Dipakai' : switching === rec.column ? 'Memuat...' : 'Gunakan Kolom Ini'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* LLM suggestion */}
       {llm && (
@@ -60,23 +107,6 @@ export default function TaskSuggestion({ data }: Props) {
               <p className="text-xs text-purple-500 mb-1">Saran Task ML</p>
               <p className="text-sm font-medium text-purple-900">{String(llm.suggested_task ?? '-')} — {String(llm.task_reason ?? '')}</p>
             </div>
-
-            {Array.isArray(llm.target_candidates) && llm.target_candidates.length > 0 && (
-              <div>
-                <p className="text-xs text-purple-500 mb-2">Kandidat Kolom Target</p>
-                <div className="space-y-2">
-                  {(llm.target_candidates as {column:string,reason:string,confidence:string}[]).map((c) => (
-                    <div key={c.column} className="flex items-start gap-2 rounded-xl bg-white/60 p-3">
-                      <code className="text-xs font-mono bg-purple-100 text-purple-700 px-2 py-0.5 rounded">{c.column}</code>
-                      <div>
-                        <span className={`text-xs font-medium ${CONFIDENCE_COLOR[c.confidence] ?? ''}`}>{c.confidence}</span>
-                        <p className="text-xs text-purple-700 mt-0.5">{c.reason}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {Array.isArray(llm.methodological_warnings) && llm.methodological_warnings.length > 0 && (
               <div>

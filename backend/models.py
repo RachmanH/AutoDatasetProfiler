@@ -74,6 +74,13 @@ class AnalyzeRequest(BaseModel):
     target_col: str | None = None
 
 
+class TargetRecommendation(BaseModel):
+    column: str
+    reason: str
+    confidence: str
+    task_suggestion: TaskSuggestion
+
+
 class AnalyzeResponse(BaseModel):
     dataset_id: str
     analysis_id: int
@@ -85,3 +92,4 @@ class AnalyzeResponse(BaseModel):
     charts: list[dict[str, Any]]
     preprocessing: list[PreprocessingStep]
     llm_understanding: dict[str, Any] | None = None
+    target_recommendations: list[TargetRecommendation] | None = None

@@ -88,14 +88,14 @@ export default function PreviewPage({ uploadData, onAnalyzed, onBack }: Props) {
         <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h3 className="mb-1 font-semibold text-slate-800">Pilih Kolom Target (opsional)</h3>
           <p className="mb-4 text-sm text-slate-500">
-            Kolom yang ingin diprediksi / dianalisis. Kosongkan untuk analisis clustering.
+            Kolom yang ingin diprediksi / dianalisis. Kosongkan agar AI yang memilihkan.
           </p>
           <select
             value={targetCol}
             onChange={(e) => setTargetCol(e.target.value)}
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            <option value="">— Tidak ada (clustering) —</option>
+            <option value="">— Biarkan AI memilih —</option>
             {meta.columns.map((col) => (
               <option key={col} value={col}>{col}</option>
             ))}

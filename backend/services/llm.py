@@ -16,7 +16,7 @@ Respons HARUS berupa JSON valid dengan struktur berikut:
   "suggested_task": "binary_classification|multiclass_classification|regression|count_regression|clustering_candidate|unknown",
   "task_reason": "alasan pemilihan task",
   "recommended_charts": [
-    {"type": "bar|histogram|pie|scatter|boxplot|grouped_bar", "columns": ["col1"], "reason": "alasan"}
+    {"type": "bar|histogram|pie|scatter|boxplot|grouped_bar|heatmap", "columns": ["col1"], "reason": "alasan"}
   ],
   "preprocessing_suggestions": ["saran preprocessing 1", "saran preprocessing 2"],
   "methodological_warnings": ["peringatan 1"],

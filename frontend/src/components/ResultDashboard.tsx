@@ -12,11 +12,12 @@ interface Props {
   data: AnalyzeResponse
   onReset: () => void
   onResearch: () => void
+  onRetarget: (targetCol: string) => Promise<void>
 }
 
 const TABS = ['Ringkasan', 'Profil Kolom', 'Chart EDA', 'Preprocessing', 'Task ML', 'Perbandingan', 'Ekspor']
 
-export default function ResultDashboard({ data, onReset, onResearch }: Props) {
+export default function ResultDashboard({ data, onReset, onResearch, onRetarget }: Props) {
   const [tab, setTab] = useState('Ringkasan')
 
   return (
@@ -68,7 +69,7 @@ export default function ResultDashboard({ data, onReset, onResearch }: Props) {
         {tab === 'Profil Kolom' && <ColumnProfiles profiles={data.profiles} />}
         {tab === 'Chart EDA' && <EDACharts charts={data.charts} />}
         {tab === 'Preprocessing' && <PreprocessingPreviews steps={data.preprocessing} />}
-        {tab === 'Task ML' && <TaskSuggestion data={data} />}
+        {tab === 'Task ML' && <TaskSuggestion data={data} onRetarget={onRetarget} />}
         {tab === 'Perbandingan' && <ColumnComparison profiles={data.profiles} charts={data.charts} />}
         {tab === 'Ekspor' && (
           <ExportPanel

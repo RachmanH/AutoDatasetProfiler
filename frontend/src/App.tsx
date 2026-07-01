@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { Step, UploadResponse, AnalyzeResponse } from './types'
+import { analyzeDataset } from './api'
 import LandingPage from './components/LandingPage'
 import UploadPage from './components/UploadPage'
 import PreviewPage from './components/PreviewPage'
@@ -56,6 +57,12 @@ export default function App() {
     setStep('results')
   }
 
+  async function handleRetarget(targetCol: string) {
+    if (!analyzeData) return
+    const data = await analyzeDataset(analyzeData.dataset_id, targetCol)
+    setAnalyzeData(data)
+  }
+
   const placeholder = (label: string) => (
     <div className="min-h-screen flex items-center justify-center text-slate-400">{label} — segera hadir</div>
   )
@@ -67,7 +74,7 @@ export default function App() {
       ? <PreviewPage uploadData={uploadData} onAnalyzed={handleAnalyzed} onBack={() => setStep('upload')} />
       : placeholder('Preview page'),
     results: analyzeData
-      ? <ResultDashboard data={analyzeData} onReset={handleReset} onResearch={() => setStep('research')} />
+      ? <ResultDashboard data={analyzeData} onReset={handleReset} onResearch={() => setStep('research')} onRetarget={handleRetarget} />
       : placeholder('Results page'),
     research: analyzeData
       ? <ResearchPRDPage analyzeData={analyzeData} onBack={() => setStep('results')} />

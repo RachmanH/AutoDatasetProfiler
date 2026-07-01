@@ -10,12 +10,12 @@ from db_models import Dataset, AnalysisResult
 from models import (
     UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile,
     DataQuality, TaskSuggestion, PreprocessingStep,
-    AnalyzeRequest, AnalyzeResponse,
+    AnalyzeRequest, AnalyzeResponse, TargetRecommendation,
 )
 from services.parser import parse_upload
 from services.profiler import profile_dataset, compute_data_quality
-from services.task_suggestion import suggest_task
-from services.charts import build_eda_charts
+from services.task_suggestion import suggest_task, guess_target_columns
+from services.charts import build_eda_charts, build_charts_from_recommendations
 from services.preprocessing import generate_preprocessing_previews
 from services.fingerprint import build_fingerprint
 from services.llm import call_llm
@@ -159,12 +159,31 @@ def analyze_dataset(req: AnalyzeRequest, db: Session = Depends(get_db)):
     raw_quality = compute_data_quality(df, raw_profiles)
     profiles = [ColumnProfile(**p) for p in raw_profiles]
     quality = DataQuality(**raw_quality)
-    task = TaskSuggestion(**suggest_task(df, req.target_col, raw_profiles))
-    charts = build_eda_charts(df, raw_profiles)
     preprocessing = [PreprocessingStep(**s) for s in generate_preprocessing_previews(df, raw_profiles)]
 
     fingerprint = build_fingerprint(df, raw_profiles, raw_quality, meta.model_dump(), req.target_col)
     llm_result = call_llm(fingerprint)
+
+    target_candidates = (llm_result or {}).get("target_candidates") or []
+    if not target_candidates:
+        target_candidates = guess_target_columns(raw_profiles)
+    resolved_target = req.target_col or (target_candidates[0]["column"] if target_candidates else None)
+    task = TaskSuggestion(**suggest_task(df, resolved_target, raw_profiles))
+
+    target_recommendations = [
+        TargetRecommendation(
+            column=c["column"],
+            reason=c.get("reason", ""),
+            confidence=c.get("confidence", "low"),
+            task_suggestion=TaskSuggestion(**suggest_task(df, c["column"], raw_profiles)),
+        )
+        for c in target_candidates[:3]
+    ] or None
+
+    recommended_charts = (llm_result or {}).get("recommended_charts") or []
+    charts = build_charts_from_recommendations(df, raw_profiles, recommended_charts) if recommended_charts else []
+    if not charts:
+        charts = build_eda_charts(df, raw_profiles)
 
     result_payload = {
         "meta": meta.model_dump(),
@@ -174,11 +193,12 @@ def analyze_dataset(req: AnalyzeRequest, db: Session = Depends(get_db)):
         "charts": charts,
         "preprocessing": [s.model_dump() for s in preprocessing],
         "llm_understanding": llm_result,
+        "target_recommendations": [t.model_dump() for t in target_recommendations] if target_recommendations else None,
     }
 
     db_result = AnalysisResult(
         dataset_id=req.dataset_id,
-        target_column=req.target_col,
+        target_column=resolved_target,
         result_json=json.dumps(result_payload, ensure_ascii=False),
     )
     db.add(db_result)
@@ -188,7 +208,7 @@ def analyze_dataset(req: AnalyzeRequest, db: Session = Depends(get_db)):
     return AnalyzeResponse(
         dataset_id=req.dataset_id,
         analysis_id=db_result.id,
-        target_col=req.target_col,
+        target_col=resolved_target,
         **result_payload,
     )
 

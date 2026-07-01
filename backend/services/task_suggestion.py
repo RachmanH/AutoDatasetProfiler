@@ -51,6 +51,32 @@ def suggest_task(df: pd.DataFrame, target_col: str | None, profiles: list[dict])
     return _result("unknown", f"Tipe kolom target '{detected_type}' tidak cocok untuk task standar.", "low")
 
 
+TARGET_NAME_KEYWORDS = (
+    "target", "label", "class", "sentiment", "outcome",
+    "category", "churn", "status", "rating", "score", "y",
+)
+
+
+def guess_target_columns(profiles: list[dict], top_n: int = 3) -> list[dict]:
+    """Rule-based target guess, used only when the LLM found no candidates."""
+    candidates = [p for p in profiles if p["detected_type"] in ("categorical", "boolean", "numeric")]
+
+    def sort_key(p: dict) -> tuple:
+        name_match = 0 if any(kw in p["column"].lower() for kw in TARGET_NAME_KEYWORDS) else 1
+        type_rank = 0 if p["detected_type"] in ("categorical", "boolean") else 1
+        return (name_match, type_rank, p["unique_count"])
+
+    ranked = sorted(candidates, key=sort_key)[:top_n]
+    return [
+        {
+            "column": p["column"],
+            "reason": "Tebakan otomatis berbasis aturan (rekomendasi AI tidak tersedia).",
+            "confidence": "medium" if sort_key(p)[0] == 0 else "low",
+        }
+        for p in ranked
+    ]
+
+
 def _result(task: str, reason: str, confidence: str) -> dict:
     return {
         "suggested_task": task,

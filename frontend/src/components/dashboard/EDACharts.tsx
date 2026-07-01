@@ -30,7 +30,7 @@ function ChartCard({ chart, colorIdx }: { chart: ChartData; colorIdx: number }) 
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h4 className="mb-4 text-sm font-semibold text-slate-700">{chart.title}</h4>
+      <h4 className="mb-4 text-sm text-slate-700">{chart.title}</h4>
       {chart.type === 'histogram' && <HistogramChart data={chart.data as {name:string,jumlah:number}[]} color={color} />}
       {chart.type === 'bar' && <BarChartComp data={chart.data as {name:string,jumlah:number}[]} color={color} />}
       {chart.type === 'pie' && <PieChartComp data={chart.data as {name:string,value:number}[]} />}
@@ -141,7 +141,7 @@ function HeatmapComp({ data, columns }: { data: HeatRow[]; columns: string[] }) 
         <thead>
           <tr>
             <th className="p-1" />
-            {columns.map((c) => <th key={c} className="p-1 font-medium text-slate-500 max-w-[60px] truncate">{c}</th>)}
+            {columns.map((c) => <th key={c} className="p-1 text-slate-500 max-w-[60px] truncate">{c}</th>)}
           </tr>
         </thead>
         <tbody>
