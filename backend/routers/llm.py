@@ -14,7 +14,15 @@ class LLMRequest(BaseModel):
     meta: dict | None = None
 
 
-@router.post("/dataset-understanding")
+@router.post(
+    "/dataset-understanding",
+    summary="Insight LLM tentang dataset",
+    description="Mengirim fingerprint dataset (ringkasan tanpa data mentah) ke LLM untuk mendapatkan interpretasi/insight konten dataset.",
+    responses={
+        404: {"description": "Dataset tidak ditemukan. Upload ulang file."},
+        503: {"description": "LLM tidak tersedia atau API key tidak dikonfigurasi."},
+    },
+)
 def dataset_understanding(req: LLMRequest):
     df = get_dataframe(req.dataset_id)
     if df is None:

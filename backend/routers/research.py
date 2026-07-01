@@ -24,7 +24,15 @@ class PRDRequest(BaseModel):
     meta: dict | None = None
 
 
-@router.post("/suggestions")
+@router.post(
+    "/suggestions",
+    summary="Saran judul riset",
+    description="Menghasilkan saran judul/topik riset via LLM berdasarkan fingerprint dataset.",
+    responses={
+        404: {"description": "Dataset tidak ditemukan. Upload ulang file."},
+        503: {"description": "LLM tidak tersedia atau API key tidak dikonfigurasi."},
+    },
+)
 def research_suggestions(req: SuggestionsRequest):
     df = get_dataframe(req.dataset_id)
     if df is None:
@@ -41,7 +49,19 @@ def research_suggestions(req: SuggestionsRequest):
     return {"dataset_id": req.dataset_id, "suggestions": result}
 
 
-@router.post("/generate-prd")
+@router.post(
+    "/generate-prd",
+    summary="Generate PRD riset (markdown)",
+    description=(
+        "Menghasilkan dokumen PRD riset dalam format markdown via LLM. Butuh judul terpilih "
+        "(`selected_title`), task terpilih (`selected_task`), latar belakang (`background`), "
+        "dan daftar pertanyaan riset (`research_questions`)."
+    ),
+    responses={
+        404: {"description": "Dataset tidak ditemukan. Upload ulang file."},
+        503: {"description": "LLM tidak tersedia atau API key tidak dikonfigurasi."},
+    },
+)
 def generate_prd(req: PRDRequest):
     df = get_dataframe(req.dataset_id)
     if df is None:

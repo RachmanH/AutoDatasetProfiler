@@ -11,6 +11,7 @@ from models import (
     UploadResponse, DatasetMeta, ProfileResponse, ColumnProfile,
     DataQuality, TaskSuggestion, PreprocessingStep,
     AnalyzeRequest, AnalyzeResponse, TargetRecommendation,
+    ChartsResponse, HistoryResponse,
 )
 from services.parser import parse_upload
 from services.profiler import profile_dataset, compute_data_quality
@@ -25,7 +26,21 @@ router = APIRouter(prefix="/api/datasets", tags=["datasets"])
 _store: dict = {}
 
 
-@router.post("/upload", response_model=UploadResponse)
+@router.post(
+    "/upload",
+    response_model=UploadResponse,
+    summary="Upload dataset CSV/XLSX",
+    description=(
+        "Upload file dataset (.csv atau .xlsx, maks 20 MB). File di-parse, disimpan sementara "
+        "di memori server, dan metadata-nya dicatat di database. Mengembalikan dataset_id "
+        "untuk dipakai pada endpoint lain."
+    ),
+    responses={
+        400: {"description": "Format file tidak didukung (harus .csv atau .xlsx)"},
+        413: {"description": "Ukuran file melebihi batas 20 MB"},
+        422: {"description": "File gagal diparse atau dataset kosong"},
+    },
+)
 async def upload_dataset(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
@@ -61,7 +76,13 @@ async def upload_dataset(
     return UploadResponse(dataset_id=dataset_id, meta=meta, preview=preview)
 
 
-@router.get("/{dataset_id}/profile", response_model=ProfileResponse)
+@router.get(
+    "/{dataset_id}/profile",
+    response_model=ProfileResponse,
+    summary="Profil kolom & kualitas data",
+    description="Mengembalikan statistik per kolom (tipe, missing, unique, sample values) dan ringkasan kualitas data (duplikat, missing, kolom id-like/constant).",
+    responses={404: {"description": "Dataset tidak ditemukan. Upload ulang file."}},
+)
 def get_profile(dataset_id: str):
     df = _store.get(dataset_id)
     if df is None:
@@ -78,7 +99,13 @@ def get_profile(dataset_id: str):
     )
 
 
-@router.get("/{dataset_id}/task-suggestion", response_model=TaskSuggestion)
+@router.get(
+    "/{dataset_id}/task-suggestion",
+    response_model=TaskSuggestion,
+    summary="Saran task ML",
+    description="Menyarankan task ML (klasifikasi/regresi/clustering, dst) berdasarkan profil dataset. Opsional `target_col` untuk mengarahkan saran ke kolom target tertentu.",
+    responses={404: {"description": "Dataset tidak ditemukan. Upload ulang file."}},
+)
 def get_task_suggestion(dataset_id: str, target_col: str | None = None):
     df = _store.get(dataset_id)
     if df is None:
@@ -89,7 +116,13 @@ def get_task_suggestion(dataset_id: str, target_col: str | None = None):
     return TaskSuggestion(**result)
 
 
-@router.get("/{dataset_id}/charts")
+@router.get(
+    "/{dataset_id}/charts",
+    response_model=ChartsResponse,
+    summary="EDA charts",
+    description="Menghasilkan chart eksplorasi data (histogram, bar, pie, boxplot, scatter, heatmap) sesuai tipe tiap kolom.",
+    responses={404: {"description": "Dataset tidak ditemukan. Upload ulang file."}},
+)
 def get_charts(dataset_id: str):
     df = _store.get(dataset_id)
     if df is None:
@@ -98,7 +131,13 @@ def get_charts(dataset_id: str):
     return {"dataset_id": dataset_id, "charts": build_eda_charts(df, raw_profiles)}
 
 
-@router.get("/{dataset_id}/preprocessing", response_model=list[PreprocessingStep])
+@router.get(
+    "/{dataset_id}/preprocessing",
+    response_model=list[PreprocessingStep],
+    summary="Preview preprocessing",
+    description="Preview langkah preprocessing yang disarankan (imputasi, encoding, normalisasi, penanganan outlier) beserta contoh nilai sebelum/sesudah.",
+    responses={404: {"description": "Dataset tidak ditemukan. Upload ulang file."}},
+)
 def get_preprocessing_preview(dataset_id: str):
     df = _store.get(dataset_id)
     if df is None:
@@ -108,7 +147,12 @@ def get_preprocessing_preview(dataset_id: str):
     return [PreprocessingStep(**s) for s in steps]
 
 
-@router.get("/history")
+@router.get(
+    "/history",
+    response_model=HistoryResponse,
+    summary="Riwayat analisis",
+    description="Mengembalikan 50 hasil analisis terakhir yang tersimpan di database.",
+)
 def get_history(db: Session = Depends(get_db)):
     results = db.query(AnalysisResult).order_by(AnalysisResult.created_at.desc()).limit(50).all()
     history = []
@@ -124,7 +168,12 @@ def get_history(db: Session = Depends(get_db)):
     return {"history": history}
 
 
-@router.get("/{dataset_id}/analysis/{analysis_id}")
+@router.get(
+    "/{dataset_id}/analysis/{analysis_id}",
+    summary="Ambil hasil analisis tersimpan",
+    description="Mengambil kembali hasil analisis lengkap (payload sama seperti response `POST /analyze`) berdasarkan analysis_id.",
+    responses={404: {"description": "Hasil analisis tidak ditemukan."}},
+)
 def get_analysis(dataset_id: str, analysis_id: int, db: Session = Depends(get_db)):
     result = db.query(AnalysisResult).filter(
         AnalysisResult.id == analysis_id,
@@ -135,7 +184,17 @@ def get_analysis(dataset_id: str, analysis_id: int, db: Session = Depends(get_db
     return {"dataset_id": dataset_id, "analysis_id": analysis_id, **json.loads(result.result_json)}
 
 
-@router.post("/analyze", response_model=AnalyzeResponse)
+@router.post(
+    "/analyze",
+    response_model=AnalyzeResponse,
+    summary="Analisis penuh dataset",
+    description=(
+        "Menjalankan pipeline analisis lengkap: profiling kolom → fingerprint dataset ke LLM → "
+        "saran task ML & kolom target → EDA charts → preview preprocessing. Hasil disimpan "
+        "ke database dan dikembalikan analysis_id-nya."
+    ),
+    responses={404: {"description": "Dataset atau metadata dataset tidak ditemukan."}},
+)
 def analyze_dataset(req: AnalyzeRequest, db: Session = Depends(get_db)):
     df = _store.get(req.dataset_id)
     if df is None:
@@ -213,7 +272,12 @@ def analyze_dataset(req: AnalyzeRequest, db: Session = Depends(get_db)):
     )
 
 
-@router.get("/{dataset_id}/export/json")
+@router.get(
+    "/{dataset_id}/export/json",
+    summary="Export hasil analisis (JSON)",
+    description="Download hasil analisis sebagai file JSON (`analysis_{analysis_id}.json`) via `analysis_id` (query param).",
+    responses={404: {"description": "Hasil analisis tidak ditemukan."}},
+)
 def export_json(dataset_id: str, analysis_id: int, db: Session = Depends(get_db)):
     result = db.query(AnalysisResult).filter(
         AnalysisResult.id == analysis_id,
@@ -230,7 +294,12 @@ def export_json(dataset_id: str, analysis_id: int, db: Session = Depends(get_db)
     )
 
 
-@router.get("/{dataset_id}/export/csv")
+@router.get(
+    "/{dataset_id}/export/csv",
+    summary="Export profil kolom (CSV)",
+    description="Download profil kolom (dari hasil analisis) sebagai file CSV (`profiles_{analysis_id}.csv`) via `analysis_id` (query param).",
+    responses={404: {"description": "Hasil analisis tidak ditemukan."}},
+)
 def export_csv(dataset_id: str, analysis_id: int, db: Session = Depends(get_db)):
     result = db.query(AnalysisResult).filter(
         AnalysisResult.id == analysis_id,

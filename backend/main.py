@@ -5,7 +5,11 @@ from database import init_db
 from routers import datasets, llm, research
 from config import OPENCODE_API_KEY
 
-app = FastAPI(title="AutoDataset Profiler API")
+app = FastAPI(
+    title="AutoDataset Profiler API",
+    description="API untuk upload dataset, profiling kolom, deteksi task ML, EDA chart, preprocessing preview, dan insight LLM.",
+    version="1.0.0",
+)
 
 app.add_middleware(
     CORSMiddleware,

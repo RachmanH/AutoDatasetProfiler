@@ -81,6 +81,23 @@ class TargetRecommendation(BaseModel):
     task_suggestion: TaskSuggestion
 
 
+class ChartsResponse(BaseModel):
+    dataset_id: str
+    charts: list[dict[str, Any]]
+
+
+class HistoryItem(BaseModel):
+    analysis_id: int
+    dataset_id: str
+    filename: str
+    target_column: str | None = None
+    created_at: str
+
+
+class HistoryResponse(BaseModel):
+    history: list[HistoryItem]
+
+
 class AnalyzeResponse(BaseModel):
     dataset_id: str
     analysis_id: int
